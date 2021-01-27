@@ -16,7 +16,7 @@ export default function MenuTop(props) {
 
     ];
     return <Navbar bg="light" expand="lg">
-        <Navbar.Brand href="#home"><img src="/logo.png" alt="Логотип" width={50}/></Navbar.Brand>
+        <Navbar.Brand href="#home"><img src="/logo.svg" alt="Логотип" width={150}/></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
