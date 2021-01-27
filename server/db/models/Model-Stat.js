@@ -29,29 +29,20 @@ modelSchema.virtual('date')
     })
 
 modelSchema.statics.fetchData = async function () {
-    const site = 'https://cc.asrsya.ru/stat/'
+    const site = 'https://cc.asrsya.ru/data/'
     const gpuRes = await axios(site + 'gpu.xml')
     const cpu = await axios(site + 'cpu.json')
     const mem = await axios(site + 'mem.json')
     const sens = await axios(site + 'sensors.json')
     const w = fs.readFileSync('./watts.txt', 'utf8');
     const watts = w.match(/Average power reading over sample period:(.*) Watts/)
-    console.log(watts[1])
     let ggppu = {}
     try {
         ggppu = JSON.parse(convert.xml2json(gpuRes.data, {compact: true, spaces: 4}))
     } catch (e) {
         //console.log('errrrrrrrrrrrr',e)
     }
-
     const gpu = ggppu.nvidia_smi_log ? ggppu.nvidia_smi_log.gpu : []
-
-    const data = {
-        gpu,
-        //cpu1: cpu.data,
-        cpu: cpu.data.sysstat.hosts[0].statistics[0]['cpu-load'],
-        mem: mem.data
-    }
     const cpus = cpu.data.sysstat.hosts[0].statistics[0]['cpu-load']
     let core;
     cpus.shift()
