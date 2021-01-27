@@ -21,10 +21,13 @@ export default function OsData(props) {
         <table className="table">
             <tbody>
             <tr>
+                <th>Дата</th>
+                <td>{os.date}</td>
+            </tr>
+            <tr>
                 <th>Потребляемая мощность</th>
                 <td>{os.watts} Watts</td>
             </tr>
-
             </tbody>
             <tbody>
             <tr>
