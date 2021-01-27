@@ -1,17 +1,19 @@
 import moment from "moment";
 
+const fs = require('fs');
 const axios = require('axios')
-const parser = require('xml2json');
 const convert = require('xml-js');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const name = 'stat';
 
+
 const modelSchema = new Schema({
-        cpus: [{usr: Number, sys: Number, temp: Number, cpu:Number}],
+        cpus: [{usr: Number, sys: Number, temp: Number, cpu: Number}],
         gpus: [{mem: Number, sys: Number, temp: Number}],
         mem: {total: Number, used: Number, active: Number, inactive: Number, free: Number},
-        centaurus: [Number]
+        centaurus: [Number],
+        watts: Number
     },
     {
         timestamps: {createdAt: 'createdAt', updatedAt: 'updatedAt'},
@@ -32,6 +34,9 @@ modelSchema.statics.fetchData = async function () {
     const cpu = await axios(site + 'cpu.json')
     const mem = await axios(site + 'mem.json')
     const sens = await axios(site + 'sensors.json')
+    const w = fs.readFileSync('./watts.txt', 'utf8');
+    const watts = w.match(/Average power reading over sample period:(.*) Watts/)
+    console.log(watts[1])
     let ggppu = {}
     try {
         ggppu = JSON.parse(convert.xml2json(gpuRes.data, {compact: true, spaces: 4}))
@@ -60,11 +65,12 @@ modelSchema.statics.fetchData = async function () {
 
     }
     return await this.create({
+        watts: watts[1],
         gpus: gpu.map(g => {
             return {
-                sys: g.utilization.gpu_util._text.replace('%',''),
-                mem: g.utilization.memory_util._text.replace('%',''),
-                temp: g.temperature.gpu_temp._text.replace('C','')
+                sys: g.utilization.gpu_util._text.replace('%', ''),
+                mem: g.utilization.memory_util._text.replace('%', ''),
+                temp: g.temperature.gpu_temp._text.replace('C', '')
             }
         }),
         cpus,

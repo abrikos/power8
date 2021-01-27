@@ -22,7 +22,7 @@ export default function OsData(props) {
             <tbody>
             <tr>
                 <th>Потребляемая мощность</th>
-                <td>NA`</td>
+                <td>{os.watts} Watts</td>
             </tr>
 
             </tbody>
