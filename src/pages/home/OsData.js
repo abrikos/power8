@@ -21,6 +21,13 @@ export default function OsData(props) {
         <table className="table">
             <tbody>
             <tr>
+                <th>Потребляемая мощность</th>
+                <td>NA</td>
+            </tr>
+
+            </tbody>
+            <tbody>
+            <tr>
                 <th colSpan={3}>Видео Tesla P100-SXM2-16GB</th>
             </tr>
             {os.gpus.map((g,i)=><tr key={i}>
