@@ -27,10 +27,11 @@ modelSchema.virtual('date')
     })
 
 modelSchema.statics.fetchData = async function () {
-    const gpuRes = await axios('http://80.73.88.213:8888/gpu.xml')
-    const cpu = await axios('http://80.73.88.213:8888/cpu.json')
-    const mem = await axios('http://80.73.88.213:8888/mem.json')
-    const sens = await axios('http://80.73.88.213:8888/sensors.json')
+    const site = 'https://cc.asrsya.ru/stat/'
+    const gpuRes = await axios(site + 'gpu.xml')
+    const cpu = await axios(site + 'cpu.json')
+    const mem = await axios(site + 'mem.json')
+    const sens = await axios(site + 'sensors.json')
     let ggppu = {}
     try {
         ggppu = JSON.parse(convert.xml2json(gpuRes.data, {compact: true, spaces: 4}))
