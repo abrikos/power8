@@ -1,6 +1,4 @@
-import User from "server/db/models/Model-User";
-import file from "server/db/models/Model-File";
-import post from "server/db/models/Model-Post";
+import stat from "server/db/models/Model-Stat";
 
 const mongoose = require("mongoose");
 require('dotenv').config();
@@ -29,7 +27,7 @@ const Mongoose = {
     isValidId: function (id) {
         return mongoose.Types.ObjectId.isValid(id)
     },
-    User, file, post
+    stat
 
 };
 export default Mongoose;

@@ -46,7 +46,9 @@
     "striptags": "^3.1.1",
     "systeminformation": "^4.34.7",
     "transliterate": "^1.0.1",
-    "web-vitals": "^0.2.4"
+    "web-vitals": "^0.2.4",
+    "xml-js": "^1.6.11",
+    "xml2json": "^0.12.0"
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",

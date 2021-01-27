@@ -6,7 +6,7 @@ export default function OsData(props) {
 
     useEffect(() => {
         init()
-        const timer = setInterval(init,5000)
+        const timer = setInterval(init,30000)
         return () => clearInterval(timer);
     }, [])
 
@@ -21,30 +21,39 @@ export default function OsData(props) {
         <table className="table">
             <tbody>
             <tr>
-                <th colSpan={2}>Процессоры</th>
+                <th colSpan={3}>Видео Tesla P100-SXM2-16GB</th>
             </tr>
-            {os.cpus.map((cpu,i)=><tr key={i}>
-                <td>{cpu.model}</td>
-                <td>{Object.keys(cpu.times).map(k=><div key={k}>{k}: {cpu.times[k]}</div>)}</td>
+            {os.gpus.map((g,i)=><tr key={i}>
+                <td><div className="alert-danger" style={{width:g.sys+'%'}}>{g.sys}%</div></td>
+                <td>
+                    Mem: {g.mem}%, Temp {g.temp} <sup>o</sup>C
+                </td>
             </tr>)}
+            </tbody>
+            <tbody>
             <tr>
-                <th colSpan={2}>Видео</th>
+                <th colSpan={3}>Память</th>
             </tr>
             <tr>
                 <td>Всего</td>
-                <td>{(os.mem.total/1024/1024/1024).toFixed(1)} Gb</td>
+                <td>{(os.mem.total / 1024).toFixed(1)} Gb</td>
             </tr>
             <tr>
-                <th colSpan={2}>Память</th>
+                <td>Использовано</td>
+                <td>{(os.mem.used / 1024).toFixed(1)} Gb</td>
             </tr>
+            </tbody>
+            <tbody>
             <tr>
-                <td>Всего</td>
-                <td>{(os.mem.total/1024/1024/1024).toFixed(1)} Gb</td>
+                <th colSpan={3}>Процессоры</th>
             </tr>
-            <tr>
-                <td>Свободно</td>
-                <td>{(os.mem.free/1024/1024/1024).toFixed(1)} Gb</td>
-            </tr>
+            {os.cpus.filter(c=>c.usr>2).length===0 && <tr><td>128 юнитов. Нет нагрузки выше 2%</td></tr>}
+            {os.cpus.filter(c=>c.usr>2).map((cpu,i)=><tr key={i}>
+                <td>{cpu.cpu}</td>
+                <td><div className="alert-danger" style={{width:cpu.usr+'%'}}>{cpu.usr}%</div></td>
+                <td> sys: {cpu.sys}%, t: {cpu.temp}<sup>o</sup>C</td>
+
+            </tr>)}
             </tbody>
         </table>
     </div>
