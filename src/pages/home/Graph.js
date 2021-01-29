@@ -7,8 +7,8 @@ export default function Graph(props){
         gpus: {label: 'Видеоускорители (%)', color: 'blue', series: ['util', 'temp', 'mem'], util: '%'},
     }
 
-    return <div>
-        <h3>Графики</h3>
+    return <div className="bg-dark">
+        <h3 className="text-light text-center">Графики</h3>
         {Object.keys(types).map(type=><Chart name={type} type={types[type]}  {...props} key={type}/>)}
 
     </div>

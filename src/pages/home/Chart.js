@@ -6,9 +6,9 @@ export default function Chart(props) {
     const [data, setData] = useState([])
 
     const labels = {
-        util: props.type.util,
-        temp: 'Температура',
-        mem: 'Память',
+        util: [props.type.util, 'green'],
+        temp: ['Температура', 'red'],
+        mem: ['Память', 'blue'],
     }
 
     useEffect(() => {
@@ -44,10 +44,10 @@ export default function Chart(props) {
         },
         series: props.type.series.map(r => {
             return {
-                color: r.color,
+                color: labels[r][1],
                 //pointPlacement: -0.2,
                 data: data.map(d => d[r]),
-                name: labels[r],
+                name: labels[r][0],
 
             }
         })
@@ -63,7 +63,7 @@ export default function Chart(props) {
         }
     }))
 
-    return <div className="border m-3">
+    return <div className="border bg-light  m-1">
         <HighchartsReact highcharts={Highcharts} options={options}/>
     </div>
 }
