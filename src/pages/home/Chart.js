@@ -4,20 +4,15 @@ import HighchartsReact from 'highcharts-react-official';
 
 export default function Chart(props) {
     const [data, setData] = useState([])
-    const types = {
-        watts: {label: 'Потребляемая мощность (Ватт)', color: 'red', series: ['util'], util: 'Ватт'},
-        cpus: {label: 'Процессоры (%)', color: 'green', series: ['util', 'temp'], util: '%'},
-        gpus: {label: 'Видеоускорители (%)', color: 'blue', series: ['util', 'temp', 'mem'], util: '%'},
-    }
 
     const labels = {
-        util: types[props.type].util,
+        util: props.type.util,
         temp: 'Температура',
         mem: 'Память',
     }
 
     useEffect(() => {
-        props.store.api(`/data/${props.type}/30`)
+        props.store.api(`/data/${props.name}/30`)
             .then(setData)
     }, [])
 
@@ -28,7 +23,7 @@ export default function Chart(props) {
             type: 'column'
         },
         title: {
-            text: types[props.type].label
+            text: props.type.label
         },
         legend: {
             enabled: true
@@ -47,7 +42,7 @@ export default function Chart(props) {
                 }
             }
         },
-        series: types[props.type].series.map(r => {
+        series: props.type.series.map(r => {
             return {
                 color: r.color,
                 //pointPlacement: -0.2,
@@ -57,6 +52,16 @@ export default function Chart(props) {
             }
         })
     };
+
+    console.log(props.type.series.map(r => {
+        return {
+            color: r.color,
+            //pointPlacement: -0.2,
+            data: data,
+            name: labels[r],
+
+        }
+    }))
 
     return <div className="border m-3">
         <HighchartsReact highcharts={Highcharts} options={options}/>

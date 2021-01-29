@@ -1,10 +1,15 @@
 import Chart from "pages/home/Chart";
 
 export default function Graph(props){
+    const types = {
+        watts: {label: 'Потребляемая мощность (Ватт)', color: 'red', series: ['util'], util: 'Ватт'},
+        cpus: {label: 'Процессоры (%)', color: 'green', series: ['util', 'temp'], util: '%'},
+        gpus: {label: 'Видеоускорители (%)', color: 'blue', series: ['util', 'temp', 'mem'], util: '%'},
+    }
+
     return <div>
         <h3>Графики</h3>
-        <Chart type="watts"  name={"Потребляемая мощность (Вт)"} {...props} />
-        <Chart type="cpus" name={"CPU"}  {...props}/>
-        <Chart type="gpus" name={"GPU"} {...props}/>
+        {Object.keys(types).map(type=><Chart name={type} type={types[type]}  {...props} key={type}/>)}
+
     </div>
 }

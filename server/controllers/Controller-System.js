@@ -54,11 +54,12 @@ module.exports.controller = function (app) {
             }
         ]
         if (types[type].unwind) aggregate.unshift({$unwind: types[type].unwind})
-        return await Mongoose.stat.aggregate(aggregate);
+        const ret =  await Mongoose.stat.aggregate(aggregate);
+        //console.log(ret)
+        return ret;
     }
 
 
-    aggregate('watts', 10).then(console.log)
     app.post('/api/data/:type/:limit', async (req, res, next) => {
         res.send(await aggregate(req.params.type, req.params.limit))
     });
