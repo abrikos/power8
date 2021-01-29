@@ -1,6 +1,6 @@
 import Mongoose from "server/db/Mongoose";
-const CronJob = require('cron').CronJob;
 
+const CronJob = require('cron').CronJob;
 
 
 module.exports.controller = function (app) {
@@ -14,7 +14,53 @@ module.exports.controller = function (app) {
     app.post('/api/os/data', async (req, res, next) => {
         Mongoose.stat.findOne()
             .sort({createdAt: -1})
-            .then(r=>res.send(r))
+            .then(r => res.send(r))
+    });
+
+
+    async function aggregate(type, limit) {
+        const types = {
+            gpus: {unwind: "$gpus", temp: "$gpus.temp", util: "$gpus.sys", mem: "$gpus.mem"},
+            cpus: {unwind: "$cpus", temp: "$cpus.temp", util: "$cpus.sys"},
+            watts: {util: "$watts"},
+
+        }
+        if (!types[type] || !(limit > 0)) return []
+        const aggregate = [
+            {
+                $group: {
+                    _id: {
+                        month: {$month: "$createdAt"},
+                        day: {$dayOfMonth: "$createdAt"},
+                        year: {$year: "$createdAt"}
+                    },
+                    first: {$min: "$createdAt"},
+                    watts: {$avg: "$watts"},
+                    temp: {$avg: types[type].temp},
+                    util: {$avg: types[type].util},
+                    mem: {$avg: types[type].mem},
+                },
+
+            },
+            {$limit: limit * 1},
+            {$sort: {first: 1}},
+            {
+                $project: {
+                    date: {$dateToString: {format: "%Y-%m-%d", date: "$first"}},
+                    temp: {$round:["$temp",1]},
+                    util: {$round:["$util",1]},
+                    mem: {$round:["$mem",1]}
+                }
+            }
+        ]
+        if (types[type].unwind) aggregate.unshift({$unwind: types[type].unwind})
+        return await Mongoose.stat.aggregate(aggregate);
+    }
+
+
+    aggregate('watts', 10).then(console.log)
+    app.post('/api/data/:type/:limit', async (req, res, next) => {
+        res.send(await aggregate(req.params.type, req.params.limit))
     });
 
 

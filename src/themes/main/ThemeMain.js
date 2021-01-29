@@ -8,7 +8,7 @@ export default function ThemeMain(props) {
     return <div>
         <div className="theme-main">
             <MenuTop {...props}/>
-            <div className="text-center">
+            <div className="text-center alert-info">
                 <h1>{process.env.REACT_APP_SITE_TITLE}</h1>
                 <i>{process.env.REACT_APP_SITE_DESCRIPTION}</i>
             </div>
