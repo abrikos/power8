@@ -6,11 +6,11 @@ export default function OsData(props) {
 
     useEffect(() => {
         init()
-        const timer = setInterval(init,30000)
+        const timer = setInterval(init, 30000)
         return () => clearInterval(timer);
     }, [])
 
-    const init = ()=>{
+    const init = () => {
         props.store.api('/os/data')
             .then(setOs)
     }
@@ -29,20 +29,22 @@ export default function OsData(props) {
                 <td>{os.watts} Watts</td>
             </tr>
             </tbody>
-            <tbody>
+            {os.gpus.length > 0 && <tbody>
             <tr>
-                <th colSpan={3}>Видео Tesla P100-SXM2-16GB</th>
+                <th colSpan={3} className="text-center">Видео Tesla P100-SXM2-16GB</th>
             </tr>
-            {os.gpus.map((g,i)=><tr key={i}>
-                <td><div className="alert-danger" style={{width:g.sys+'%'}}>{g.sys}%</div></td>
+            {os.gpus.map((g, i) => <tr key={i}>
+                <td>
+                    <div className="alert-danger" style={{width: g.sys + '%'}}>{g.sys}%</div>
+                </td>
                 <td>
                     Mem: {g.mem}%, Temp {g.temp} <sup>o</sup>C
                 </td>
             </tr>)}
-            </tbody>
+            </tbody>}
             <tbody>
             <tr>
-                <th colSpan={3}>Память</th>
+                <th colSpan={3} className="text-center">Оперативная память</th>
             </tr>
             <tr>
                 <td>Всего</td>
@@ -55,12 +57,16 @@ export default function OsData(props) {
             </tbody>
             <tbody>
             <tr>
-                <th colSpan={3}>Процессоры</th>
+                <th colSpan={3} className="text-center">Процессоры</th>
             </tr>
-            {os.cpus.filter(c=>c.usr>2).length===0 && <tr><td>128 юнитов. Нет нагрузки выше 2%</td></tr>}
-            {os.cpus.filter(c=>c.usr>2).map((cpu,i)=><tr key={i}>
+            {os.cpus.filter(c => c.usr > 2).length === 0 && <tr>
+                <td>128 юнитов. Нет нагрузки выше 2%</td>
+            </tr>}
+            {os.cpus.filter(c => c.usr > 2).map((cpu, i) => <tr key={i}>
                 <td>{cpu.cpu}</td>
-                <td><div className="alert-danger" style={{width:cpu.usr+'%'}}>{cpu.usr}%</div></td>
+                <td>
+                    <div className="alert-danger" style={{width: cpu.usr + '%'}}>{cpu.usr}%</div>
+                </td>
                 <td> sys: {cpu.sys}%, t: {cpu.temp}<sup>o</sup>C</td>
 
             </tr>)}
