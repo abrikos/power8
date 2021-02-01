@@ -8,7 +8,7 @@ export default function Graph(props){
     }
 
     return <div className="bg-dark">
-        <h3 className="text-light text-center">Графики</h3>
+        <h3 className="text-light text-center">Статистика по дням</h3>
         {Object.keys(types).map(type=><Chart name={type} type={types[type]}  {...props} key={type}/>)}
 
     </div>
