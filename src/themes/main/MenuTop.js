@@ -8,7 +8,7 @@ import LoginFormGoogle from "components/login/LoginFormGoogle";
 
 export default function MenuTop(props) {
     const items = [
-        {label: "Ресурсы", href: "/"},
+        {label: "Ресурсы", href: "/resource"},
         {label: "Графики", href: "/graph"},
         {label: "Спецификации", href: "/spec"},
         //{label: "Видео", items: [{label: "Level 1", href: "/zzz"}, {label: "Level 2", href: "/zzz"}]},
@@ -17,7 +17,7 @@ export default function MenuTop(props) {
 
     ];
     return <Navbar bg="light" expand="lg">
-        <Navbar.Brand href="#home"><img src="/logo.svg" alt="Логотип" width={150}/></Navbar.Brand>
+        <Navbar.Brand href="/"><img src="/logo.svg" alt="Логотип" width={150}/></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">

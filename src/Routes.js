@@ -9,10 +9,12 @@ import Cabinet from "pages/cabinet/cabinet";
 import PostView from "pages/post/PostView";
 import Power8 from "pages/power8/Power8";
 import Graph from "pages/home/Graph";
+import OsData from "pages/home/OsData";
 
 export default function Routes(store) {
     const routes = {
-        "/": () => <Home store={store}/>,
+        "/": () => <Graph store={store}/>,
+        "/resource": () => <OsData store={store}/>,
         "/spec": () => <Power8 store={store}/>,
         "/graph": () => <Graph store={store}/>,
         "/news": () => <PostList key={'news'} title="Новости" modelName="post" filter={{order: {createdAt: -1}}} store={store}/>,
