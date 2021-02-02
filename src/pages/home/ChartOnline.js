@@ -10,7 +10,7 @@ export default function ChartOnline(props) {
         init();
         const timer = setInterval(init, 60000)
         return () => clearInterval(timer);
-    }, [data])
+    }, [])
 
     function init(){
         props.store.api(`/online/30`)
