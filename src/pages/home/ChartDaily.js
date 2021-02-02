@@ -2,22 +2,22 @@ import {useEffect, useState} from "react";
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
-export default function Chart(props) {
+export default function ChartDaily(props) {
     const [data, setData] = useState([])
 
     const labels = {
-        util: [props.type.util, 'green'],
-        temp: ['Температура', 'red'],
+        watts: [props.type.label, 'orange'],
+        util: ['%', 'green'],
+        temp: ['Температура (°C)', 'red'],
         mem: ['Память', 'blue'],
     }
 
     useEffect(() => {
-        props.store.api(`/data/${props.name}/30`)
+        props.store.api(`/daily/${props.name}/30`)
             .then(setData)
     }, [])
 
 
-    console.log(JSON.stringify(data))
     const options = {
         chart: {
             type: 'column'
@@ -27,6 +27,9 @@ export default function Chart(props) {
         },
         legend: {
             enabled: true
+        },
+        yAxis: {
+            title: {text: props.type.yAxis || ''}
         },
         xAxis: {categories: data.map(d => d.date)},
         plotOptions: {
@@ -52,16 +55,6 @@ export default function Chart(props) {
             }
         })
     };
-
-    console.log(props.type.series.map(r => {
-        return {
-            color: r.color,
-            //pointPlacement: -0.2,
-            data: data,
-            name: labels[r],
-
-        }
-    }))
 
     return <div className="border bg-light  m-1">
         <HighchartsReact highcharts={Highcharts} options={options}/>

@@ -43,18 +43,24 @@ modelSchema.statics.fetchData = async function () {
         //console.log('errrrrrrrrrrrr',e)
     }
     const gpu = ggppu.nvidia_smi_log ? ggppu.nvidia_smi_log.gpu : []
-    const cpus = cpu.data.sysstat.hosts[0].statistics[0]['cpu-load']
+    const cpus128 = cpu.data.sysstat.hosts[0].statistics[0]['cpu-load']
     let core;
-    cpus.shift()
-    for (const cpu of cpus) {
-        if (sens.data["ibmpowernv-isa-0000"][`Core ${cpu.cpu * 1}`]) {
-            core = sens.data["ibmpowernv-isa-0000"][`Core ${cpu.cpu * 1}`]
-
+    cpus128.shift()
+    const cpus = [];
+    for (let core = 0; core < 16; core++) {
+        let sys = 0
+        let usr = 0;
+        for (let cp = 0; cp < 8; cp++) {
+            const coreNum = cp + core * 8;
+            sys += cpus128[coreNum].sys
+            usr += cpus128[coreNum].usr
         }
-
-        cpu.temp = core[Object.keys(core)[0]];
-
+        sys = Math.round(sys / 8 * 100) / 100;
+        usr = Math.round(usr / 8 * 100) / 100;
+        const temp = sens.data["ibmpowernv-isa-0000"]['Core ' + (core * 8)][`temp${core + 1}_input`]
+        cpus.push({sys, usr, temp})
     }
+
     return await this.create({
         watts: watts[1],
         gpus: gpu.map(g => {
