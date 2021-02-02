@@ -28,8 +28,6 @@ export default function ChartOnline(props) {
         return {cpus, gpus, dates}
     }
 
-    console.log(data.gpus)
-
     const options = {
         title: {
             text: 'Нагрузка онлайн'
