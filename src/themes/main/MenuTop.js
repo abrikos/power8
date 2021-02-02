@@ -9,7 +9,7 @@ import LoginFormGoogle from "components/login/LoginFormGoogle";
 export default function MenuTop(props) {
     const items = [
         //{label: "Нагрузка онлайн", href: "/resource"},
-        //{label: "Графики", href: "/graph"},
+        {label: "Статистика", href: "/"},
         {label: "Спецификации", href: "/spec"},
         //{label: "Видео", items: [{label: "Level 1", href: "/zzz"}, {label: "Level 2", href: "/zzz"}]},
         {label: "АДМИН", href: "/admin", hidden: !(props.store.authenticatedUser && props.store.authenticatedUser.admin)},
