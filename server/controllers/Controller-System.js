@@ -66,7 +66,7 @@ module.exports.controller = function (app) {
         res.send(await aggregate(req.params.type, req.params.limit))
     });
 
-    app.post('/api/online/:type/:limit', async (req, res, next) => {
+    app.post('/api/online/:limit', async (req, res, next) => {
         Mongoose.stat.find()
             .sort({createdAt: -1})
             .limit(req.params.limit * 1)

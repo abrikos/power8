@@ -7,12 +7,13 @@ export default function ChartOnline(props) {
     const [data, setData] = useState([])
     delete props.types.watts;
     useEffect(() => {
+        init();
         const timer = setInterval(init, 60000)
         return () => clearInterval(timer);
     }, [data])
 
     function init(){
-        props.store.api(`/online/${props.name}/30`)
+        props.store.api(`/online/30`)
             .then(d => setData(adaptData(d)))
     }
 
