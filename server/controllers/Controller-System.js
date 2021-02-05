@@ -8,7 +8,7 @@ module.exports.controller = function (app) {
         const data = await Mongoose.stat.fetchData()
     }, null, true, 'America/Los_Angeles');
 
-    Mongoose.stat.fetchData()
+    Mongoose.stat.fetchData().then(console.log)
 
 
     app.post('/api/os/data', async (req, res, next) => {

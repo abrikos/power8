@@ -2,11 +2,11 @@ import {useEffect, useState} from "react";
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
-export default function ChartDaily(props) {
+export default function ChartWatts(props) {
     const [data, setData] = useState([])
 
     useEffect(() => {
-        props.store.api(`/daily/${props.name}/30`)
+        props.store.api(`/daily/watts/30`)
             .then(setData)
     }, [])
 
@@ -16,18 +16,14 @@ export default function ChartDaily(props) {
             type: 'column'
         },
         title: {
-            text: props.type.label
+            text: 'Потребленная мощность'
         },
         legend: {
             enabled: true
         },
-        yAxis: [{
-            title: {text: '%'},
-        }, {
-            title: {text: '°C', rotation:0,},
-
-            opposite: true
-        }],
+        yAxis: {
+            title: {text: 'Ватт'},
+        },
         xAxis: {categories: data.map(d => d.date)},
         plotOptions: {
             bar: {
@@ -42,18 +38,12 @@ export default function ChartDaily(props) {
                 }
             }
         },
-        series: [{
-            yAxis: 0,
-            color:'green',
-            name:'Нагрузка %',
-            data: data.map(d=>d.util)
-        }, {
-            color:'red',
-            name:'Температура (°C)',
-            yAxis: 1, data: data.map(d=>d.temp)
-        }]
+        series: {
+            color:'orange',
+            data: data.map(d=>d.watts)
+        }
     };
-
+    console.log(data)
     return <div className="border bg-light  m-1">
         <HighchartsReact highcharts={Highcharts} options={options}/>
     </div>
