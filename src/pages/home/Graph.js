@@ -2,6 +2,7 @@ import ChartDaily from "pages/home/ChartDaily";
 import React from "react";
 import ChartOnline from "pages/home/ChartOnline";
 import ChartWatts from "pages/home/ChartWatts";
+import ChartHourly from "pages/home/ChartHourly";
 
 export default function Graph(props){
     const types = {
@@ -13,6 +14,7 @@ export default function Graph(props){
     return <div>
 
         <ChartOnline types={types} {...props}/>
+        <ChartHourly {...props}/>
 
         <h3 className="text-center">Статистика по дням</h3>
         <div  className="bg-dark p-1">

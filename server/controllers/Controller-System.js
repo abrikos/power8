@@ -8,7 +8,7 @@ module.exports.controller = function (app) {
         const data = await Mongoose.stat.fetchData()
     }, null, true, 'America/Los_Angeles');
 
-    Mongoose.stat.fetchData().then(console.log)
+    //Mongoose.stat.fetchData().then(console.log)
 
 
     app.post('/api/os/data', async (req, res, next) => {
@@ -18,7 +18,7 @@ module.exports.controller = function (app) {
     });
 
 
-    async function aggregate(type, limit) {
+    async function aggregateDay(type, limit) {
         const types = {
             gpus: {unwind: "$gpus", temp: "$gpus.temp", util: "$gpus.sys", mem: "$gpus.mem"},
             cpus: {unwind: "$cpus", temp: "$cpus.temp", util: "$cpus.sys"},
@@ -46,7 +46,7 @@ module.exports.controller = function (app) {
             {$sort: {first: 1}},
             {
                 $project: {
-                    date: {$dateToString: {format: "%Y-%m-%d", date: "$first"}},
+                    hour: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone:"Asia/Yakutsk"}},
                     temp: {$round: ["$temp", 1]},
                     util: {$round: ["$util", 1]},
                     mem: {$round: ["$mem", 1]},
@@ -60,10 +60,53 @@ module.exports.controller = function (app) {
         return ret;
     }
 
-    //aggregate('gpus', 10)        .then(console.log)
+    //Mongoose.stat.find({createdAt: {"$gt": new Date(Date.now() - 24 * 60 * 60 * 1000)}}).then(r=>console.log(r.map(c=>c.cpus)))
+
+    async function aggregateHour() {
+
+        const aggregate = [
+            {$unwind: "$cpus"},
+            {$unwind: "$gpus"},
+            {$match: {createdAt: {"$gt": new Date(Date.now() - 24 * 60 * 60 * 1000)}}},
+            {
+                $group: {
+                    _id: {
+                        hour: {$hour: "$createdAt"},
+                    },
+                    first: {$min: "$createdAt"},
+                    gpus: {$avg: "$gpus.sys"},
+                    cpus: {$avg: "$cpus.usr"},
+                    watts: {$avg: "$watts"},
+                },
+
+            },
+            {$limit: 24},
+            {$sort: {first: 1}},
+            {
+                $project: {
+                    hour: {$dateToString: {format: "%H", date: "$first", timezone:"Asia/Yakutsk"}},
+                    gpus: {$round: ["$gpus", 1]},
+                    cpus: {$round: ["$cpus", 1]},
+                    watts: {$round: ["$watts", 1]},
+                }
+            }
+        ]
+        //aggregate.unshift({$unwind: "$cpus"})
+        //aggregate.unshift({$unwind: "$gpus"})
+
+        const ret = await Mongoose.stat.aggregate(aggregate);
+        //console.log(ret)
+        return ret;
+    }
+
+    aggregateHour( )        .then(console.log)
 
     app.post('/api/daily/:type/:limit', async (req, res, next) => {
-        res.send(await aggregate(req.params.type, req.params.limit))
+        res.send(await aggregateDay(req.params.type, req.params.limit))
+    });
+
+    app.post('/api/hourly', async (req, res, next) => {
+        res.send(await aggregateHour( ))
     });
 
     app.post('/api/online/:limit', async (req, res, next) => {
