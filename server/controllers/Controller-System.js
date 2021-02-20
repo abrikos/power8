@@ -8,7 +8,7 @@ module.exports.controller = function (app) {
         const data = await Mongoose.stat.fetchData()
     }, null, true, 'America/Los_Angeles');
 
-    //Mongoose.stat.fetchData().then(console.log)
+    Mongoose.stat.fetchData().then(console.log)
 
 
     app.post('/api/os/data', async (req, res, next) => {
@@ -99,7 +99,7 @@ module.exports.controller = function (app) {
         return ret;
     }
 
-    aggregateDay('gpus', 10 )        .then(console.log)
+    //aggregateDay('gpus', 10 )        .then(console.log)
 
     app.post('/api/daily/:type/:limit', async (req, res, next) => {
         res.send(await aggregateDay(req.params.type, req.params.limit))
