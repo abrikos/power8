@@ -34,8 +34,8 @@ modelSchema.statics.fetchData = async function () {
     const cpu = await axios(site + 'cpu.json')
     const mem = await axios(site + 'mem.json')
     const sens = await axios(site + 'sensors.json')
-    const w = fs.readFileSync('./watts.txt', 'utf8');
-    const watts = w.match(/Average power reading over sample period:(.*) Watts/)
+    const w = await axios(site + 'watts.dat')
+    const watts = w.data.match(/Average power reading over sample period:(.*) Watts/)
     let ggppu = {}
     try {
         ggppu = JSON.parse(convert.xml2json(gpuRes.data, {compact: true, spaces: 4}))
