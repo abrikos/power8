@@ -46,7 +46,7 @@ module.exports.controller = function (app) {
             {$sort: {first: 1}},
             {
                 $project: {
-                    hour: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone:"Asia/Yakutsk"}},
+                    date: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone:"Asia/Yakutsk"}},
                     temp: {$round: ["$temp", 1]},
                     util: {$round: ["$util", 1]},
                     mem: {$round: ["$mem", 1]},
@@ -99,7 +99,7 @@ module.exports.controller = function (app) {
         return ret;
     }
 
-    aggregateHour( )        .then(console.log)
+    aggregateDay('gpus', 10 )        .then(console.log)
 
     app.post('/api/daily/:type/:limit', async (req, res, next) => {
         res.send(await aggregateDay(req.params.type, req.params.limit))
