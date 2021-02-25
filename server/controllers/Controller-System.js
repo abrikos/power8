@@ -50,7 +50,7 @@ module.exports.controller = function (app) {
                     temp: {$round: ["$temp", 1]},
                     util: {$round: ["$util", 1]},
                     mem: {$round: ["$mem", 1]},
-                    watts: {$round: [{$divide: ["$watts", 1440]}, 1]}
+                    watts: {$round: [{$divide: ["$watts", 60]}, 1]}
                 }
             }
         ]
