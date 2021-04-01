@@ -66,7 +66,7 @@ modelSchema.statics.fetchData = async function () {
             mem: {total: mem.data[0].quantity, used: mem.data[1].quantity, active: mem.data[2].quantity, inactive: mem.data[3].quantity, free: mem.data[4].quantity}
         })
     } catch (e){
-
+        console.log(e)
     }
 
 }
