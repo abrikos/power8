@@ -5,7 +5,7 @@ const axios = require('axios')
 const convert = require('xml-js');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const name = 'stat';
+const name = 'systemdata';
 
 
 const modelSchema = new Schema({
@@ -53,7 +53,7 @@ modelSchema.statics.fetchData = async function () {
         }
         const cpus = [{sys: cpusData.sys, usr: cpusData.usr, temp: Math.round(temp / 16)}];
 
-        return await this.create({
+        const data = await this.create({
             watts: watts[1],
             gpus: gpu.map(g => {
                 return {
@@ -65,6 +65,8 @@ modelSchema.statics.fetchData = async function () {
             cpus,
             mem: {total: mem.data[0].quantity, used: mem.data[1].quantity, active: mem.data[2].quantity, inactive: mem.data[3].quantity, free: mem.data[4].quantity}
         })
+        return data
+
     } catch (e){
         console.log(e)
     }
