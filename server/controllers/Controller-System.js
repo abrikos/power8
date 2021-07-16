@@ -4,7 +4,7 @@ const CronJob = require('cron').CronJob;
 
 
 module.exports.controller = function (app) {
-    const job = new CronJob('0 * * * * *', async function () {
+    const job = new CronJob('*/20 * * * * *', async function () {
         const data = await Mongoose.stat.fetchData()
     }, null, true, 'America/Los_Angeles');
 
