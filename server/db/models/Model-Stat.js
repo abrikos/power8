@@ -34,7 +34,6 @@ async function fetch(url){
 
 modelSchema.statics.fetchData = async function () {
     try {
-        console.log('FETCH DATA')
         const site = process.env.DATA_SITE;
         const gpuRes = await fetch(site + 'gpu.xml')
         const cpu = await fetch(site + 'cpu.json')
