@@ -28,14 +28,19 @@ modelSchema.virtual('date')
         return moment(this.createdAt).format('YYYY-MM-DD HH:mm:ss')
     })
 
+async function fetch(url){
+    return axios(url).catch(e=>console.log(e.message, url))
+}
+
 modelSchema.statics.fetchData = async function () {
     try {
+        console.log('FETCH DATA')
         const site = 'https://cc.asrsya.ru/data/'
-        const gpuRes = await axios(site + 'gpu.xml').catch(e=>console.log(e.message, e.response.config.url))
-        const cpu = await axios(site + 'cpu.json').catch(e=>console.log(e.message, e.response.config.url))
-        const mem = await axios(site + 'mem.json').catch(e=>console.log(e.message, e.response.config.url))
-        const sens = await axios(site + 'sensors.json').catch(e=>console.log(e.message, e.response.config.url))
-        const w = await axios(site + 'watts.txt').catch(e=>console.log(e.message, e.response.config.url))
+        const gpuRes = await fetch(site + 'gpu.xml')
+        const cpu = await fetch(site + 'cpu.json')
+        const mem = await fetch(site + 'mem.json')
+        const sens = await fetch(site + 'sensors.json')
+        const w = await fetch(site + 'watts.txt')
         const watts = w.data.match(/Average power reading over sample period:(.*) Watts/)
         let ggppu = {}
         try {
