@@ -29,7 +29,8 @@ modelSchema.virtual('date')
     })
 
 async function fetch(url) {
-    return axios(url).catch(e => console.log(e.message, url))
+    console.log(url);
+    return axios(url).catch(e => console.log(e.message, url));
 }
 
 modelSchema.statics.fetchData = async function () {
