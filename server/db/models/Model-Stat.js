@@ -41,7 +41,7 @@ modelSchema.statics.fetchData = async function () {
         const sens = await fetch(site + 'sensors.json')
         const w = await fetch(site + 'watts.txt')
         try {
-            console.log(cpu.data)
+            console.log(cpu.data.sysstat.hosts)
             const watts = w.data.match(/Average power reading over sample period:(.*) Watts/)
 
             let ggppu = {}
