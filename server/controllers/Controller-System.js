@@ -8,8 +8,8 @@ module.exports.controller = function (app) {
         const data = await Mongoose.stat.fetchData()
     }, null, true, 'America/Los_Angeles');
 
-    Mongoose.stat.fetchData().then(console.log)
-    aggregateHour('gpus', 10 )        .then(console.log)
+    Mongoose.stat.fetchData();
+    aggregateHour('gpus', 10);
 
     app.post('/api/os/data', async (req, res, next) => {
         Mongoose.stat.findOne()
@@ -25,6 +25,7 @@ module.exports.controller = function (app) {
             watts: {util: "$watts"},
 
         }
+        console.log(type)
         if (!types[type] || !(limit > 0)) return []
         const aggregate = [
             {
@@ -46,21 +47,59 @@ module.exports.controller = function (app) {
             {$sort: {first: 1}},
             {
                 $project: {
-                    date: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone:"Asia/Yakutsk"}},
-                    temp: {$round: ["$temp", 1]},
-                    util: {$round: ["$util", 1]},
-                    mem: {$round: ["$mem", 1]},
-                    watts: {$round: [{$divide: ["$watts", 60]}, 1]}
+                    date: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone: "Asia/Yakutsk"}},
+                    //temp: {$round: ["$temp", 1]},
+                    //util: {$round: ["$util", 1]},
+                    //mem: {$round: ["$mem", 1]},
+                    //watts: {$round: [{$divide: ["$watts", 60]}, 1]}
                 }
             }
         ]
         if (types[type].unwind) aggregate.unshift({$unwind: types[type].unwind})
         const ret = await Mongoose.stat.aggregate(aggregate);
-        //console.log(ret)
+        console.log(ret)
         return ret;
     }
 
-    //Mongoose.stat.find({createdAt: {"$gt": new Date(Date.now() - 24 * 60 * 60 * 1000)}}).then(r=>console.log(r.map(c=>c.cpus)))
+    const agg = [
+        {
+            $group: {
+                _id: {
+                    month: {$month: "$createdAt"},
+                    day: {$dayOfMonth: "$createdAt"},
+                    year: {$year: "$createdAt"}
+                },
+                first: {$min: "$createdAt"},
+                watts:{$sum:"$watts"},
+                temp: {$min: "$cpuTemp"},
+            }
+        },
+        {$sort: {first: -1}},
+        {
+            $project: {
+                date: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone: "Asia/Yakutsk"}},
+                temp: "$temp",
+                util: {$round: ["$util", 1]},
+                mem: {$round: ["$mem", 1]},
+                watts: {$round: [{$divide: ["$watts", 60]}, 1]},
+
+            }
+        },
+        {
+            $facet: {
+                paginatedResults: [{ $skip: 0 }, { $limit: 2 }],
+                totalCount: [
+                    {
+                        $count: 'count'
+                    }
+                ]
+            }
+        },
+
+    ];
+    Mongoose.stat.aggregate(agg).then(r=>console.log(r[0].paginatedResults))
+
+    Mongoose.stat.find({cpuTemp:{$gt:0}}).then(r=>console.log(r.map(c=>c.cpuTemp)))
 
     async function aggregateHour() {
 
@@ -84,7 +123,7 @@ module.exports.controller = function (app) {
             {$sort: {first: 1}},
             {
                 $project: {
-                    hour: {$dateToString: {format: "%H", date: "$first", timezone:"Asia/Yakutsk"}},
+                    hour: {$dateToString: {format: "%H", date: "$first", timezone: "Asia/Yakutsk"}},
                     gpus: {$round: ["$gpus", 1]},
                     cpus: {$round: ["$cpus", 1]},
                     watts: {$round: ["$watts", 1]},
@@ -100,13 +139,12 @@ module.exports.controller = function (app) {
     }
 
 
-
     app.post('/api/daily/:type/:limit', async (req, res, next) => {
         res.send(await aggregateDay(req.params.type, req.params.limit))
     });
 
     app.post('/api/hourly', async (req, res, next) => {
-        res.send(await aggregateHour( ))
+        res.send(await aggregateHour())
     });
 
     app.post('/api/online/:limit', async (req, res, next) => {

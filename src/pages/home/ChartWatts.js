@@ -43,7 +43,6 @@ export default function ChartWatts(props) {
             data: data.map(d=>d.watts)
         }
     };
-    console.log(data)
     return <div className="border bg-light  m-1">
         <HighchartsReact highcharts={Highcharts} options={options}/>
     </div>

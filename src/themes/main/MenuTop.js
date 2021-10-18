@@ -1,12 +1,13 @@
 import React from 'react';
 import "themes/main/menu-top.sass"
-import {A} from "hookrouter"
 import {Navbar} from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import LoginFormGoogle from "components/login/LoginFormGoogle";
+import {Link} from "react-router-dom";
 
 export default function MenuTop(props) {
+    console.log('zzzzzzzzzz',props.store)
     const items = [
         //{label: "Нагрузка онлайн", href: "/resource"},
         {label: "Статистика", href: "/"},
@@ -23,10 +24,10 @@ export default function MenuTop(props) {
             <Nav className="mr-auto">
                 {items.filter(i=>!i.hidden).map((item, i) => item.items ?
                     <NavDropdown title={item.label} id="basic-nav-dropdown" key={i}>
-                        {item.items.map((item2, i2) => <NavDropdown.Item key={i2} as={"span"}><A href={item2.href}>{item2.label}</A></NavDropdown.Item>)}
+                        {item.items.map((item2, i2) => <NavDropdown.Item key={i2} as={"span"}><Link to={item2.href}>{item2.label}</Link></NavDropdown.Item>)}
                     </NavDropdown>
                     :
-                    <Nav.Link as={"span"} key={i}><A href={item.href}>{item.label}</A></Nav.Link>)}
+                    <Nav.Link as={"span"} key={i}><Link to={item.href}>{item.label}</Link></Nav.Link>)}
                 {/*<Nav.Item>
                     {props.store.authenticatedUser ? <A href="/logout" className={'nav-link'}>Выход</A> : <LoginFormGoogle store={props.store}/>}
                 </Nav.Item>*/}

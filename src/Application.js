@@ -1,4 +1,3 @@
-import {useRoutes} from "hookrouter";
 import routes from "Routes";
 import ThemeMain from "themes/main/ThemeMain";
 import ThemeAdmin from "themes/admin/ThemeAdmin";
@@ -68,12 +67,11 @@ export default function Application() {
         },
     }
 
-    let routeResult = useRoutes(routes(store));
     const admin = window.location.pathname.match(/^\/editor/);
     return (
         <div className="App">
-            {!admin && <ThemeMain routeResult={routeResult} store={store}/>}
-            {admin && <ThemeAdmin routeResult={routeResult} store={store}/>}
+            {!admin && <ThemeMain store={store}/>}
+            {admin && <ThemeAdmin store={store}/>}
         </div>
     );
 }

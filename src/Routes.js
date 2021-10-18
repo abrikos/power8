@@ -1,4 +1,5 @@
 import React from "react";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Home from "pages/home/home";
 import PostList from "pages/post/PostList";
 import Logout from "components/login/Logout";
@@ -10,51 +11,57 @@ import PostView from "pages/post/PostView";
 import Power8 from "pages/power8/Power8";
 import Graph from "pages/home/Graph";
 import OsData from "pages/home/OsData";
+import MenuTop from "./themes/main/MenuTop";
 
-export default function Routes(store) {
+export default function Routes(props) {
     const routes = {
-        "/": () => <Graph store={store}/>,
-        "/resource": () => <OsData store={store}/>,
-        "/spec": () => <Power8 store={store}/>,
-        "/graph": () => <Graph store={store}/>,
-        "/news": () => <PostList key={'news'} title="Новости" modelName="post" filter={{order: {createdAt: -1}}} store={store}/>,
-        "/post/:id/:head": (params) => <PostView store={store} {...params}/>,
-        "/login": () => <Login store={store}/>,
+        "/": () => <Graph {...props}/>,
+        "/resource": () => <OsData {...props}/>,
+        "/spec": () => <Power8 {...props}/>,
+        "/graph": () => <Graph {...props}/>,
+        "/news": () => <PostList key={'news'} title="Новости" modelName="post" filter={{order: {createdAt: -1}}} {...props}/>,
+        "/post/:id/:head": (params) => <PostView {...props} {...params}/>,
+        "/login": () => <Login {...props}/>,
 
-        //"/persons/:type": (params) => <PersonListLarge {...params} store={store}/>,
+        //"/persons/:type": (params) => <PersonListLarge {...params} {...props}/>,
 
     };
 
     const routesLogged = {
-        "/cabinet": () => <Cabinet store={store}/>,
-        "/logout": () => <Logout store={store}/>,
+        "/cabinet": () => <Cabinet {...props}/>,
+        "/logout": () => <Logout {...props}/>,
     }
 
     const routesEditor = {}
 
     const routesAdmin = {
-        "/admin/:control": (params) => <AdminIndex {...params} store={store}/>,
-        "/admin/:control/:id/update": (params) => <AdminIndex {...params} store={store}/>,
-        "/admin": () => <AdminIndex store={store}/>,
+        "/admin/:control": (params) => <AdminIndex {...params} {...props}/>,
+        "/admin/:control/:id/update": (params) => <AdminIndex {...params} {...props}/>,
+        "/admin": () => <AdminIndex {...props}/>,
     }
 
 
     for (const path of Object.keys(routesLogged)) {
-        routes[path] = store.authenticatedUser ? routesLogged[path] : () => <ErrorPage error={401} store={store}/>;
+        routes[path] = props.authenticatedUser ? routesLogged[path] : () => <ErrorPage error={401} {...props}/>;
     }
     for (const path of Object.keys(routesEditor)) {
-        routes[path] = store.authenticatedUser ?
-            store.authenticatedUser.editor || store.authenticatedUser.admin ? routesEditor[path] : () => <ErrorPage error={403} store={store} message={'Доступ разрешен только редакторам'}/>
+        routes[path] = props.authenticatedUser ?
+            props.authenticatedUser.editor || props.authenticatedUser.admin ? routesEditor[path] : () => <ErrorPage error={403} {...props} message={'Доступ разрешен только редакторам'}/>
             :
-            () => <ErrorPage error={401} store={store}/>
+            () => <ErrorPage error={401} {...props}/>
         ;
     }
     for (const path of Object.keys(routesAdmin)) {
-        routes[path] = store.authenticatedUser ?
-            store.authenticatedUser.admin ? routesAdmin[path] : () => <ErrorPage error={403} store={store} message={'Доступ разрешен только администраторам'}/>
+        routes[path] = props.authenticatedUser ?
+            props.authenticatedUser.admin ? routesAdmin[path] : () => <ErrorPage error={403} {...props} message={'Доступ разрешен только администраторам'}/>
             :
-            () => <ErrorPage error={401} store={store}/>
+            () => <ErrorPage error={401} {...props}/>
         ;
     }
-    return routes;
+    return <Router>
+        <MenuTop {...props}/>
+        <Switch>
+            {Object.keys(routes).map(path=><Route exact path={path}>{routes[path]}</Route>)}
+        </Switch>
+    </Router>;
 }
