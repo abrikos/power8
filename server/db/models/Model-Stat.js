@@ -29,7 +29,6 @@ modelSchema.virtual('date')
     })
 
 async function fetch(url) {
-    console.log(url);
     return axios(url).catch(e => console.log(e.message, url));
 }
 
@@ -42,6 +41,7 @@ modelSchema.statics.fetchData = async function () {
         const sens = await fetch(site + 'sensors.json')
         const w = await fetch(site + 'watts.txt')
         try {
+            console.log(cpu.data)
             const watts = w.data.match(/Average power reading over sample period:(.*) Watts/)
 
             let ggppu = {}
