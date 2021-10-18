@@ -28,8 +28,8 @@ modelSchema.virtual('date')
         return moment(this.createdAt).format('YYYY-MM-DD HH:mm:ss')
     })
 
-async function fetch(url){
-    return axios(url).catch(e=>console.log(e.message, url))
+async function fetch(url) {
+    return axios(url).catch(e => console.log(e.message, url))
 }
 
 modelSchema.statics.fetchData = async function () {
@@ -40,38 +40,49 @@ modelSchema.statics.fetchData = async function () {
         const mem = await fetch(site + 'mem.json')
         const sens = await fetch(site + 'sensors.json')
         const w = await fetch(site + 'watts.txt')
-        const watts = w.data.match(/Average power reading over sample period:(.*) Watts/)
-        let ggppu = {}
         try {
-            ggppu = JSON.parse(convert.xml2json(gpuRes.data, {compact: true, spaces: 4}))
-        } catch (e) {
-            //console.log('errrrrrrrrrrrr',e)
-        }
-        const gpu = ggppu.nvidia_smi_log ? ggppu.nvidia_smi_log.gpu : []
-        const cpusData = cpu.data.sysstat.hosts[0].statistics[0]['cpu-load'][0]
-        let core;
+            const watts = w.data.match(/Average power reading over sample period:(.*) Watts/)
 
-        let temp = 0
-        for (let core = 0; core < 16; core++) {
-            temp += sens.data["ibmpowernv-isa-0000"]['Core ' + (core * 8)][`temp${core + 1}_input`]
-        }
-        const cpus = [{sys: cpusData.sys, usr: cpusData.usr, temp: Math.round(temp / 16)}];
+            let ggppu = {}
+            try {
+                ggppu = JSON.parse(convert.xml2json(gpuRes.data, {compact: true, spaces: 4}))
+            } catch (e) {
+                //console.log('errrrrrrrrrrrr',e)
+            }
+            const gpu = ggppu.nvidia_smi_log ? ggppu.nvidia_smi_log.gpu : []
+            const cpusData = cpu.data.sysstat.hosts[0].statistics[0]['cpu-load'][0]
+            let core;
 
-        const data = await this.create({
-            watts: watts[1],
-            gpus: gpu.map(g => {
-                return {
-                    sys: g.utilization.gpu_util._text.replace('%', ''),
-                    mem: g.utilization.memory_util._text.replace('%', ''),
-                    temp: g.temperature.gpu_temp._text.replace('C', '')
+            let temp = 0
+            for (let core = 0; core < 16; core++) {
+                temp += sens.data["ibmpowernv-isa-0000"]['Core ' + (core * 8)][`temp${core + 1}_input`]
+            }
+            const cpus = [{sys: cpusData.sys, usr: cpusData.usr, temp: Math.round(temp / 16)}];
+
+            const data = await this.create({
+                watts: watts[1],
+                gpus: gpu.map(g => {
+                    return {
+                        sys: g.utilization.gpu_util._text.replace('%', ''),
+                        mem: g.utilization.memory_util._text.replace('%', ''),
+                        temp: g.temperature.gpu_temp._text.replace('C', '')
+                    }
+                }),
+                cpus,
+                mem: {
+                    total: mem.data[0].quantity,
+                    used: mem.data[1].quantity,
+                    active: mem.data[2].quantity,
+                    inactive: mem.data[3].quantity,
+                    free: mem.data[4].quantity
                 }
-            }),
-            cpus,
-            mem: {total: mem.data[0].quantity, used: mem.data[1].quantity, active: mem.data[2].quantity, inactive: mem.data[3].quantity, free: mem.data[4].quantity}
-        })
-        return data
+            })
+            return data
+        } catch (e) {
+            console.log(e)
+        }
 
-    } catch (e){
+    } catch (e) {
         console.log(e)
     }
 
