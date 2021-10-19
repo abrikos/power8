@@ -12,7 +12,7 @@ export default function ChartOnline(props) {
         return () => clearInterval(timer);
     }, [])
 
-    function init(){
+    function init() {
         props.store.api(`/online/30`)
             .then(d => setData(adaptData(d)))
     }
@@ -22,8 +22,8 @@ export default function ChartOnline(props) {
     }
 
     function adaptData(d) {
-        const gpus = d.map(dd => avg(dd.gpus.map(c => c.sys)))
-        const cpus = d.map(dd => avg(dd.cpus.map(c => (c.sys + c.usr) / 2)))
+        const gpus = d.map(dd => dd.gpuUtil)
+        const cpus = d.map(dd => dd.cpuUtil)
         const dates = d.map(dd => moment(dd.date).format('HH:mm'))
         return {cpus, gpus, dates}
     }

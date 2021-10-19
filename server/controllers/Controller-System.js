@@ -20,8 +20,8 @@ module.exports.controller = function (app) {
 
     async function aggregateDay(type, limit) {
         const types = {
-            gpus: {unwind: "$gpus", temp: "$gpus.temp", util: "$gpus.sys", mem: "$gpus.mem"},
-            cpus: {unwind: "$cpus", temp: "$cpus.temp", util: "$cpus.sys"},
+            gpus: {unwind: "$gpus", temp: "$gpuTemp", util: "$gpuUtil", mem: "$gpus.mem"},
+            cpus: {unwind: "$cpus", temp: "$cpuTemp", util: "$cpuUtil"},
             watts: {util: "$watts"},
 
         }
@@ -43,69 +43,48 @@ module.exports.controller = function (app) {
                 },
 
             },
+
+            {$sort: {"first": -1}},
             {$limit: limit * 1},
-            {$sort: {first: 1}},
             {
                 $project: {
                     date: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone: "Asia/Yakutsk"}},
-                    //temp: {$round: ["$temp", 1]},
-                    //util: {$round: ["$util", 1]},
-                    //mem: {$round: ["$mem", 1]},
-                    //watts: {$round: [{$divide: ["$watts", 60]}, 1]}
+                    temp: {$round: ["$temp", 1]},
+                    util: {$round: ["$util", 1]},
+                    mem: {$round: ["$mem", 1]},
+                    watts: {$round: [{$divide: ["$watts", 60]}, 1]}
                 }
-            }
+            },
+
         ]
-        if (types[type].unwind) aggregate.unshift({$unwind: types[type].unwind})
+        const aggregate2 = [
+            {
+                $group: {
+                    _id: "$gpuTemp",
+                    first: {$min: "$createdAt"},
+                }
+            },
+            {
+                $project: {
+                    date: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone: "Asia/Yakutsk"}},
+                }
+            },
+            {$sort: {"createdAt": -1}},
+            {$limit: limit * 1},
+        ]
+        //if (types[type].unwind) aggregate.unshift({$unwind: types[type].unwind})
         const ret = await Mongoose.stat.aggregate(aggregate);
-        console.log(ret)
-        return ret;
+        return ret.reverse();
     }
 
-    const agg = [
-        {
-            $group: {
-                _id: {
-                    month: {$month: "$createdAt"},
-                    day: {$dayOfMonth: "$createdAt"},
-                    year: {$year: "$createdAt"}
-                },
-                first: {$min: "$createdAt"},
-                watts:{$sum:"$watts"},
-                temp: {$min: "$cpuTemp"},
-            }
-        },
-        {$sort: {first: -1}},
-        {
-            $project: {
-                date: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone: "Asia/Yakutsk"}},
-                temp: "$temp",
-                util: {$round: ["$util", 1]},
-                mem: {$round: ["$mem", 1]},
-                watts: {$round: [{$divide: ["$watts", 60]}, 1]},
 
-            }
-        },
-        {
-            $facet: {
-                paginatedResults: [{ $skip: 0 }, { $limit: 2 }],
-                totalCount: [
-                    {
-                        $count: 'count'
-                    }
-                ]
-            }
-        },
+    aggregateDay('cpus', 2).then(console.log)
 
-    ];
-    Mongoose.stat.aggregate(agg).then(r=>console.log(r[0].paginatedResults))
-
-    Mongoose.stat.find({cpuTemp:{$gt:0}}).then(r=>console.log(r.map(c=>c.cpuTemp)))
+    //Mongoose.stat.find({cpuTemp:{$gt:0}}).then(r=>console.log(r.map(c=>c.cpuTemp)))
 
     async function aggregateHour() {
 
         const aggregate = [
-            {$unwind: "$cpus"},
-            {$unwind: "$gpus"},
             {$match: {createdAt: {"$gt": new Date(Date.now() - 24 * 60 * 60 * 1000)}}},
             {
                 $group: {
@@ -113,8 +92,8 @@ module.exports.controller = function (app) {
                         hour: {$hour: "$createdAt"},
                     },
                     first: {$min: "$createdAt"},
-                    gpus: {$avg: "$gpus.sys"},
-                    cpus: {$avg: "$cpus.usr"},
+                    gpus: {$avg: "$gpuUtil"},
+                    cpus: {$avg: "$cpuUtil"},
                     watts: {$avg: "$watts"},
                 },
 
@@ -130,8 +109,6 @@ module.exports.controller = function (app) {
                 }
             }
         ]
-        //aggregate.unshift({$unwind: "$cpus"})
-        //aggregate.unshift({$unwind: "$gpus"})
 
         const ret = await Mongoose.stat.aggregate(aggregate);
         //console.log(ret)
