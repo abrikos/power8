@@ -27,6 +27,7 @@ module.exports.controller = function (app) {
         }
         if (!types[type] || !(limit > 0)) return []
         const aggregate = [
+            {$match: {gpuUtil: {$ne: null}}},
             {
                 $group: {
                     _id: {
@@ -56,21 +57,7 @@ module.exports.controller = function (app) {
             },
 
         ]
-        const aggregate2 = [
-            {
-                $group: {
-                    _id: "$gpuTemp",
-                    first: {$min: "$createdAt"},
-                }
-            },
-            {
-                $project: {
-                    date: {$dateToString: {format: "%Y-%m-%d", date: "$first", timezone: "Asia/Yakutsk"}},
-                }
-            },
-            {$sort: {"createdAt": -1}},
-            {$limit: limit * 1},
-        ]
+
         //if (types[type].unwind) aggregate.unshift({$unwind: types[type].unwind})
         const ret = await Mongoose.stat.aggregate(aggregate);
         return ret.reverse();
@@ -82,9 +69,8 @@ module.exports.controller = function (app) {
     //Mongoose.stat.find({cpuTemp:{$gt:0}}).then(r=>console.log(r.map(c=>c.cpuTemp)))
 
     async function aggregateHour() {
-
         const aggregate = [
-            {$match: {createdAt: {"$gt": new Date(Date.now() - 24 * 60 * 60 * 1000)}}},
+            {$match: {createdAt: {"$gt": new Date(Date.now() - 24 * 60 * 60 * 1000)}, gpuUtil: {$ne: null}}},
             {
                 $group: {
                     _id: {
