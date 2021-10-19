@@ -22,6 +22,7 @@ export default function ChartOnline(props) {
     }
 
     function adaptData(d) {
+        console.log(d)
         const gpus = d.map(dd => dd.gpuUtil)
         const cpus = d.map(dd => dd.cpuUtil)
         const dates = d.map(dd => moment(dd.date).format('HH:mm'))

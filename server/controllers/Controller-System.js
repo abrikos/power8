@@ -25,7 +25,6 @@ module.exports.controller = function (app) {
             watts: {util: "$watts"},
 
         }
-        console.log(type)
         if (!types[type] || !(limit > 0)) return []
         const aggregate = [
             {
@@ -78,7 +77,7 @@ module.exports.controller = function (app) {
     }
 
 
-    aggregateDay('cpus', 2).then(console.log)
+    //aggregateDay('cpus', 2).then(console.log)
 
     //Mongoose.stat.find({cpuTemp:{$gt:0}}).then(r=>console.log(r.map(c=>c.cpuTemp)))
 
